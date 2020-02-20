@@ -1,4 +1,4 @@
-# calendar-file-poc
+# ICS Generate
 
 ## Project setup
 ```
