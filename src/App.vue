@@ -2,7 +2,7 @@
   <div class="calender-file__container">
     <header class="calender-file__header">
       <h1 class="calender-file__header-title">
-        Generate
+        Generator
       </h1>
       <img
         class="calender-file__header-logo"
