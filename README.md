@@ -1,4 +1,4 @@
-# ICS Generate
+# ICS Generator
 
 ## Project setup
 ```
