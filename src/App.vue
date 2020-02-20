@@ -149,6 +149,7 @@ body {
 .calender-file__header-logo {
   width: 60px;
   height: 60px;
+  transition: all .2s;
 }
 
 .calender-file__form {
@@ -225,5 +226,23 @@ body {
 
 .calender-file__form__form-btn:active {
   background-color: #2e5799;
+}
+
+@media (max-width: 768px) {
+  .calender-file__form {
+    min-height: 500px;
+    width: 100%;
+    border-radius: 0px;
+    margin-bottom: 0px;
+  }
+  
+  .calender-file__header-title {
+    display: none;
+  }
+
+  .calender-file__header-logo {
+    width: 110px;
+    height: 110px;
+  }
 }
 </style>
