@@ -12,7 +12,7 @@
     <form @submit.prevent class="calender-file__form">
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
-          Novo do Evento:
+          Novo do Evento
         </label>
         <input
           type="text"
@@ -33,7 +33,7 @@
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
-          Localização:
+          Localização
         </label>
         <input
           type="text"
@@ -54,7 +54,7 @@
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
-          Data de início:
+          Data de início
         </label>
         <datetime
           type="datetime"
@@ -76,7 +76,7 @@
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
-          Data de término:
+          Data de término
         </label>
         <datetime
           type="datetime"
@@ -98,7 +98,7 @@
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
-          Descrição:
+          Descrição
         </label>
         <textarea
           rows="5"
@@ -119,8 +119,9 @@
       </div>
       <div class="calender-file__form__form-group btn-container">
         <button
-          class="calender-file__form__form-btn"
           @click="generate"
+          :disabled="loading"
+          class="calender-file__form__form-btn"
         >
           Gerar
         </button>
@@ -156,18 +157,28 @@ export default {
         return;
       }
 
-      const cal = ics();
-      const {
-        name,
-        description,
-        location,
-        startDate,
-        endDate,
-      } = this.event;
+      this.loading = true;
+      try {
+        const cal = ics();
+        const {
+          name,
+          description,
+          location,
+          startDate,
+          endDate,
+        } = this.event;
+  
+        cal.addEvent(name, description, location, startDate, endDate);
+        cal.download();
 
-      cal.addEvent(name, description, location, startDate, endDate);
-      cal.download();
+      } catch (err) {
+        console.log(`An error occurred during the event creation process: ${err}`);
+        
+      } finally {
+        this.loading = false;
+      }
     },
+
   },
   validations: {
     event: {
@@ -316,6 +327,13 @@ body {
   border-radius: 5px;
   cursor: pointer;
   outline: none;
+  user-select: none;
+  transition: all .3s;
+}
+
+.calender-file__form__form-btn:disabled {
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.247);
 }
 
 .calender-file__form__form-btn:hover {
