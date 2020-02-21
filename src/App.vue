@@ -58,6 +58,7 @@
         </label>
         <datetime
           type="datetime"
+          value-zone="UTC-3"
           format="dd/MM/yyyy hh:mm a"
           v-model="$v.event.startDate.$model"
           class="form-control--datetime"
@@ -80,6 +81,7 @@
         </label>
         <datetime
           type="datetime"
+          value-zone="UTC-3"
           format="dd/MM/yyyy hh:mm a"
           v-model="$v.event.endDate.$model"
           class="form-control--datetime"
@@ -120,11 +122,38 @@
       <div class="calender-file__form__form-group btn-container">
         <button
           @click="generate"
-          :disabled="loading"
           class="calender-file__form__form-btn"
         >
           Gerar
         </button>
+      </div>
+      <div
+        v-if="canGenerate"
+        class="calender-file__form__form-group"
+      >
+        <h3 class="calender-file__form__form-group__title">
+          Adicionar evento ao seu calendário
+        </h3>
+        <div class="btn-container--hosts">
+          <button
+            class="calender-file__form__form-btn btn-host"
+            @click="downloadFile"
+          >
+            <img :src="require('@/assets/icons/mac-logo.svg')" />
+          </button>
+          <button
+            class="calender-file__form__form-btn btn-host"
+            @click="gmail"
+          >
+            <img :src="require('@/assets/icons/gmail-logo.svg')" />
+          </button>
+          <button
+            class="calender-file__form__form-btn btn-host"
+            @click="downloadFile"
+          >
+            <img :src="require('@/assets/icons/outlook-logo.svg')" />
+          </button>
+        </div>
       </div>
     </form>
   </div>
@@ -137,7 +166,7 @@ import { required } from 'vuelidate/lib/validators';
 export default {
   data () {
     return {
-      loading: false,
+      canGenerate: false,
       event: {
         name: '',
         description: '',
@@ -152,33 +181,47 @@ export default {
   },
   methods: {
     generate () {
-      this.$v.event.$touch();
+      this.$v.$touch();
       if (this.$v.event.$invalid) {
         return;
       }
 
-      this.loading = true;
-      try {
-        const cal = ics();
-        const {
-          name,
-          description,
-          location,
-          startDate,
-          endDate,
-        } = this.event;
-  
-        cal.addEvent(name, description, location, startDate, endDate);
-        cal.download();
-
-      } catch (err) {
-        console.log(`An error occurred during the event creation process: ${err}`);
-        
-      } finally {
-        this.loading = false;
-      }
+      this.canGenerate = true;
     },
+    downloadFile () {
+      const calendar = ics();
+      const {
+        name,
+        description,
+        location,
+        startDate,
+        endDate,
+      } = this.event;
 
+      calendar.addEvent(name, description, location, startDate, endDate);
+      calendar.download();
+    },
+    gmail () {
+      let {
+        name,
+        description,
+        location,
+        startDate,
+        endDate,
+      } = this.event;
+
+      startDate = startDate
+        .split('.')[0]
+        .replace(/:|-|\./g, '');
+
+      endDate = startDate
+        .split('.')[0]
+        .replace(/:|-|\./g, '');
+
+      window.open(
+        `https://calendar.google.com/calendar/r/eventedit?text=${name}&dates=${startDate}/${endDate}&details=${description}&location=${location}`
+      )
+    },
   },
   validations: {
     event: {
@@ -262,6 +305,11 @@ body {
   padding: .1px;
 }
 
+.calender-file__form__form-group__title {
+  text-align: center;
+  font-size: 18px;
+}
+
 .calender-file__form__form-label {
   display: inline-block;
   font-size: 14px;
@@ -329,6 +377,22 @@ body {
   outline: none;
   user-select: none;
   transition: all .3s;
+}
+
+.btn-container--hosts {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-host {
+  padding: 0px;
+  margin: 0px 16px;
+  background-color: #fff !important;
+}
+
+.btn-host img {
+  height: 30px;
+  width: 30px;
 }
 
 .calender-file__form__form-btn:disabled {
