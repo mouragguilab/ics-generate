@@ -12,13 +12,24 @@
     <form @submit.prevent class="calender-file__form">
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
-          Assunto:
+          Novo do Evento:
         </label>
         <input
-          v-model="event.subject"
-          class="calender-file__form__form-control"
           type="text"
+          v-model="$v.event.name.$model"
+          class="calender-file__form__form-control"
+          :class="{
+            'form-control--error': $v.event.name.$dirty && $v.event.name.$invalid,
+          }"
         />
+        <template v-if="$v.event.name.$dirty">
+          <span
+            v-if="!$v.event.name.required"
+            class="calender-file__form__form-alert form-alert--error"
+          >
+            Campo obrigatório
+          </span>
+        </template>
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
@@ -26,31 +37,64 @@
         </label>
         <input
           type="text"
-          v-model="event.location"
+          v-model="$v.event.location.$model"
           class="calender-file__form__form-control"
+          :class="{
+            'form-control--error': $v.event.location.$dirty && $v.event.location.$invalid,
+          }"
         />
+        <template v-if="$v.event.location.$dirty">
+          <span
+            v-if="!$v.event.location.required"
+            class="calender-file__form__form-alert form-alert--error"
+          >
+            Campo obrigatório
+          </span>
+        </template>
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
           Data de início:
         </label>
         <datetime
-          v-model="event.startDate"
-          class="calender-file__form__form-control--datetime"
           type="datetime"
           format="dd/MM/yyyy hh:mm a"
+          v-model="$v.event.startDate.$model"
+          class="form-control--datetime"
+          :class="{
+            'form-control--error': $v.event.startDate.$dirty && $v.event.startDate.$invalid,
+          }"
         />
+        <template v-if="$v.event.startDate.$dirty">
+          <span
+            v-if="!$v.event.startDate.required"
+            class="calender-file__form__form-alert form-alert--error"
+          >
+            Campo obrigatório
+          </span>
+        </template>
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
           Data de término:
         </label>
         <datetime
-          v-model="event.endDate"
-          class="calender-file__form__form-control--datetime"
           type="datetime"
           format="dd/MM/yyyy hh:mm a"
+          v-model="$v.event.endDate.$model"
+          class="form-control--datetime"
+          :class="{
+            'form-control--error': $v.event.endDate.$dirty && $v.event.endDate.$invalid,
+          }"
         />
+        <template v-if="$v.event.endDate.$dirty">
+          <span
+            v-if="!$v.event.endDate.required"
+            class="calender-file__form__form-alert form-alert--error"
+          >
+            Campo obrigatório
+          </span>
+        </template>
       </div>
       <div class="calender-file__form__form-group">
         <label class="calender-file__form__form-label" for="">
@@ -58,9 +102,20 @@
         </label>
         <textarea
           rows="5"
-          v-model="event.description"
+          v-model="$v.event.description.$model"
           class="calender-file__form__form-control"
+          :class="{
+            'form-control--error': $v.event.description.$dirty && $v.event.description.$invalid,
+          }"
         />
+        <template v-if="$v.event.description.$dirty">
+          <span
+            v-if="!$v.event.description.required"
+            class="calender-file__form__form-alert form-alert--error"
+          >
+            Campo obrigatório
+          </span>
+        </template>
       </div>
       <div class="calender-file__form__form-group btn-container">
         <button
@@ -76,13 +131,14 @@
 
 <script>
 import ics from '@/assets/js/ics';
+import { required } from 'vuelidate/lib/validators';
 
 export default {
   data () {
     return {
       loading: false,
       event: {
-        subject: '',
+        name: '',
         description: '',
         location: '',
         startDate: '',
@@ -90,21 +146,48 @@ export default {
       }
     };
   },
+  mounted () {
+    this.$v.$reset();
+  },
   methods: {
     generate () {
+      this.$v.event.$touch();
+      if (this.$v.event.$invalid) {
+        return;
+      }
+
       const cal = ics();
       const {
-        subject,
+        name,
         description,
         location,
         startDate,
         endDate,
       } = this.event;
 
-      cal.addEvent(subject, description, location, startDate, endDate);
+      cal.addEvent(name, description, location, startDate, endDate);
       cal.download();
     },
-  }
+  },
+  validations: {
+    event: {
+      name: {
+        required,
+      },
+      description: {
+        required,
+      },
+      location: {
+        required,
+      },
+      startDate: {
+        required,
+      },
+      endDate: {
+        required,
+      },
+    },
+  },
 };
 </script>
 
@@ -163,8 +246,15 @@ body {
 }
 
 .calender-file__form__form-group {
-  margin-bottom: 24px;
+  position: relative;
+  margin-bottom: 32px;
   padding: .1px;
+}
+
+.calender-file__form__form-label {
+  display: inline-block;
+  font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .calender-file__form__form-control {
@@ -179,7 +269,11 @@ body {
   outline: none;
 }
 
-.calender-file__form__form-control--datetime {
+.form-control--error {
+  border-color: #B43232 !important;
+}
+
+.form-control--datetime {
   display: block;
   width: 100%;
   font-size: 16px;
@@ -190,7 +284,7 @@ body {
   outline: none;
 }
 
-.calender-file__form__form-control--datetime input {
+.form-control--datetime input {
   padding: 12px;
   height: 100%;
   width: 100%;
@@ -198,10 +292,14 @@ body {
   border: none;
 }
 
-.calender-file__form__form-label {
-  display: inline-block;
-  font-size: 14px;
-  margin-bottom: 8px;
+.calender-file__form__form-alert {
+  position: absolute;
+  top: calc(100% + 4px);
+  font-size: 12px;
+}
+
+.form-alert--error {
+  color: #B43232;
 }
 
 .btn-container {
