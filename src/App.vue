@@ -136,19 +136,19 @@
         </h3>
         <div class="btn-container--hosts">
           <button
-            class="calender-file__form__form-btn btn-host"
+            class="btn-host"
             @click="downloadFile"
           >
             <img :src="require('@/assets/icons/mac-logo.svg')" />
           </button>
           <button
-            class="calender-file__form__form-btn btn-host"
+            class="btn-host"
             @click="gmail"
           >
             <img :src="require('@/assets/icons/gmail-logo.svg')" />
           </button>
           <button
-            class="calender-file__form__form-btn btn-host"
+            class="btn-host"
             @click="downloadFile"
           >
             <img :src="require('@/assets/icons/outlook-logo.svg')" />
@@ -214,7 +214,7 @@ export default {
         .split('.')[0]
         .replace(/:|-|\./g, '');
 
-      endDate = startDate
+      endDate = endDate
         .split('.')[0]
         .replace(/:|-|\./g, '');
 
@@ -372,27 +372,11 @@ body {
   border: none;
   color: #fff;
   font-weight: bold;
-  border-radius: 5px;
   cursor: pointer;
   outline: none;
   user-select: none;
-  transition: all .3s;
-}
-
-.btn-container--hosts {
-  display: flex;
-  justify-content: center;
-}
-
-.btn-host {
-  padding: 0px;
-  margin: 0px 16px;
-  background-color: #fff !important;
-}
-
-.btn-host img {
-  height: 30px;
-  width: 30px;
+  transition: all .1s;
+  border-bottom: 8px solid #23457c;
 }
 
 .calender-file__form__form-btn:disabled {
@@ -405,7 +389,27 @@ body {
 }
 
 .calender-file__form__form-btn:active {
-  background-color: #2e5799;
+  border-width: 3px;
+  margin-top: 5px;
+}
+
+.btn-container--hosts {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-host {
+  padding: 0px;
+  margin: 0px 16px;
+  border: none;
+  background-color: #fff !important;
+  outline: none;
+  cursor: pointer;
+}
+
+.btn-host img {
+  height: 30px;
+  width: 30px;
 }
 
 @media (max-width: 768px) {
